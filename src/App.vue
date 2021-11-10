@@ -50,7 +50,7 @@ export default {
       .catch((err) => {
         alert(err.message);
       })
-      .finally(() => this.isTemplatesFetching = true);
+      .finally(() => this.isTemplatesFetching = false);
   },
   methods: {
     handleTemplateSel(hash) {
