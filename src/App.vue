@@ -7,37 +7,44 @@
         class="loader"
       />
     </div>
-    <div class="center flex-wrap">
-      <ImgCard
-        class="img"
-        v-for="meme in memes"
-        :key="meme.id"
-        :name="meme.name"
-        :url="meme.url"
-        :hash="meme"
-        @selection="handleTemplateSel"
-      />
-    </div>
-    <Modal :hash="selectedHash" @cancel="onCancel" />
+    <Modal className="center flex-wrap" @close="handleModalClose">
+      <template #trigger="modalProps">
+        <ImgCard
+          class="img"
+          v-for="meme in memes"
+          :key="meme.id"
+          :name="meme.name"
+          :url="meme.url"
+          :hash="meme"
+          @selection="(hash) => proceedToGenerate(hash, modalProps.open)"
+        />
+      </template>
+      <template #default="modalProps">
+        <GenModal v-if="!hideGenModal" :hash="selectedHash" @close="modalProps.close" />
+      </template>
+    </Modal>
   </v-app>
 </template>
 
 <script>
 import { getTemplates } from '@/store.js';
 import ImgCard from '@/components/ImgCard.vue';
-import Modal from '@/components/GenImage.vue';
+import GenModal from '@/components/GenImage.vue';
+import Modal from '@/components/Modal.vue';
 
 export default {
   name: 'App',
   components: {
     ImgCard,
-    Modal
+    Modal,
+    GenModal
   },
   data() {
     return {
       memes: [],
-      isTemplatesFetching: false,
-      selectedHash: null
+      selectedHash: null,
+      hideGenModal: false,
+      isTemplatesFetching: false
     }
   },
   created() {
@@ -53,13 +60,15 @@ export default {
       .finally(() => this.isTemplatesFetching = false);
   },
   methods: {
-    handleTemplateSel(hash) {
+    proceedToGenerate(hash, openGenModal) {
       if (hash) {
+        this.hideGenModal = false;
         this.selectedHash = hash;
+        openGenModal();
       }
     },
-    onCancel() {
-      this.selectedHash = null;
+    handleModalClose() {
+      this.hideGenModal = true;
     }
   }
 }
@@ -77,10 +86,8 @@ export default {
     background-color: rgb(32, 33, 36);
   }
   .loader-container {
-    /* To stack before modal */
     width: 100%;
     position: relative;
-    z-index: 1;
     top: 50%;
     transform: translateY(-50%);
   }

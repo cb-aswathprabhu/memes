@@ -1,60 +1,51 @@
 <template>
-  <v-row justify="center">
-    <v-dialog
-      v-model="isVisible"
-      max-width="450"
-      persistent
-    >
-      <v-card>
-        <v-toolbar class="text-h6 mb-8">
-          It would be fun to tweak!
-        </v-toolbar>
-        <v-text-field
-          class="form-field"
-          v-model="text0"
-          label="Text #1"
-          :rules="[rules.text0]"
-          :autofocus=true
-        />
-        <v-text-field
-          v-model="text1"
-          class="form-field mb-2"
-          label="Text #2 (Optional)"
-        />
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            class="mb-2"
-            color="green darken-1"
-            text
-            @click="closeModal"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            class="mb-2"
-            color="green darken-1"
-            text
-            :loading="isGenerating"
-            @click="genImage"
-          >
-            Generate
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-row>
+  <v-card>
+    <v-toolbar class="text-h6 mb-8">
+      It would be fun to tweak!
+    </v-toolbar>
+    <v-text-field
+      class="form-field"
+      v-model="text0"
+      label="Text #1"
+      :rules="[rules.text0]"
+      :autofocus=true
+    />
+    <v-text-field
+      v-model="text1"
+      class="form-field mb-2"
+      label="Text #2 (Optional)"
+    />
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        class="mb-2"
+        color="green darken-1"
+        text
+        @click="$emit('close')"
+      >
+        Cancel
+      </v-btn>
+      <v-btn
+        class="mb-2"
+        color="green darken-1"
+        text
+        :loading="isGenerating"
+        @click="genImage"
+      >
+        Generate
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
 import { generateMeme } from '@/store.js';
 
   export default {
-    props: ['isModalVisible', 'hash'],
+    props: ['hash'],
     data() {
       return {
         isGenerating: false,
-        isVisible: false,
         text0: '',
         text1: '',
         rules: {
@@ -62,21 +53,7 @@ import { generateMeme } from '@/store.js';
         }
       }
     },
-    watch: {
-      hash() {
-        if (this.hash) {
-          this.openModal();
-        }
-      }
-    },
     methods: {
-      openModal() {
-        this.isVisible = true;
-      },
-      closeModal() {
-        this.$emit('cancel');
-        this.isVisible = false;
-      },
       genImage() {
         let { text0, text1 } = this;
         if (text0) {
@@ -87,8 +64,8 @@ import { generateMeme } from '@/store.js';
             .then((response) => {
               let { data: { url } = {} } = response || {};
               if (url) {
-                window.open(url, '_blank').focus();
-                this.closeModal();
+                window.open(url, '_blank')?.focus();
+                this.$emit('close');
               } else {
                 alert('Something went wrong!')
               }
