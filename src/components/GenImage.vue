@@ -38,44 +38,41 @@
   </v-card>
 </template>
 
-<script>
-import { generateMeme } from '@/store.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import { generateMeme } from '@/store';
 
-  export default {
-    props: ['hash'],
-    data() {
-      return {
-        isGenerating: false,
-        text0: '',
-        text1: '',
-        rules: {
-          text0: (value) => !!value
-        }
-      }
-    },
-    methods: {
-      genImage() {
-        let { text0, text1 } = this;
-        if (text0) {
-          // API expects atleast text0 or text1 to be available
-          // Hence we're making text0 mandatory!
-          this.isGenerating = true;
-          generateMeme({ text0, text1, id: this.hash?.id })
-            .then((response) => {
-              let { data: { url } = {} } = response || {};
-              if (url) {
-                window.open(url, '_blank')?.focus();
-                this.$emit('close');
-              } else {
-                alert('Something went wrong!')
-              }
-            })
-            .catch((err) => alert(err.message))
-            .finally(() => this.isGenerating = false);
-        }
-      }
+@Component
+export default class GenImage extends Vue {
+  @Prop() hash;
+  isGenerating = false;
+  text0 = '';
+  text1 = '';
+  rules = {
+    text0: (value: string) => !!value
+  }
+
+  genImage(): any {
+    let { text0, text1 } = this;
+    if (text0) {
+      // API expects atleast text0 or text1 to be available
+      // Hence we're making text0 mandatory!
+      this.isGenerating = true;
+      generateMeme({ text0, text1, id: this.hash?.id })
+        .then((response: any) => {
+          let { data: { url = '' } = {} } = response || {};
+          if (url) {
+            window.open(url, '_blank')?.focus();
+            this.$emit('close');
+          } else {
+            alert('Something went wrong!')
+          }
+        })
+        .catch((err: any) => alert(err.message))
+        .finally(() => this.isGenerating = false);
     }
   }
+}
 </script>
 <style scoped>
   .form-field {

@@ -4,7 +4,7 @@ export const getTemplates = function() {
 };
 
 export const generateMeme = function({ text0, text1, id: template_id }) {
-  let formData = new FormData();
+  const formData = new FormData();
   formData.append('text0', text0);
   formData.append('text1', text1);
   formData.append('template_id', template_id);

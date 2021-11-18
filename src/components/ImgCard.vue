@@ -15,10 +15,15 @@
   </v-card>
 </template>
 
-<script>
-  export default {
-    props: ['name', 'url', 'onSelection', 'hash']
-  }
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+@Component
+export default class ImgCard extends Vue {
+  @Prop() name: string;
+  @Prop() url: string;
+  @Prop() hash;
+}
 </script>
 
 <style scoped>

@@ -7,27 +7,30 @@
         class="loader"
       />
     </div>
-    <Modal className="center flex-wrap" @close="handleModalClose">
+    <Modal>
       <template #trigger="modalProps">
-        <ImgCard
-          class="img"
-          v-for="meme in memes"
-          :key="meme.id"
-          :name="meme.name"
-          :url="meme.url"
-          :hash="meme"
-          @selection="(hash) => proceedToGenerate(hash, modalProps.open)"
-        />
+        <div class="center flex-wrap">
+          <ImgCard
+            class="img"
+            v-for="meme in memes"
+            :key="meme.id"
+            :name="meme.name"
+            :url="meme.url"
+            :hash="meme"
+            @selection="(hash) => proceedToGenerate(hash, modalProps.open)"
+          />
+        </div>
       </template>
       <template #default="modalProps">
-        <GenModal v-if="!hideGenModal" :hash="selectedHash" @close="modalProps.close" />
+        <!-- `key` needed here to tell vue to not reuse GenModal that was rendered for a previous selectedHash -->
+        <GenModal :key="selectedHash ? selectedHash.id : null" :hash="selectedHash" @close="modalProps.close" />
       </template>
     </Modal>
   </v-app>
 </template>
 
 <script>
-import { getTemplates } from '@/store.js';
+import { getTemplates } from '@/store';
 import ImgCard from '@/components/ImgCard.vue';
 import GenModal from '@/components/GenImage.vue';
 import Modal from '@/components/Modal.vue';
@@ -43,7 +46,6 @@ export default {
     return {
       memes: [],
       selectedHash: null,
-      hideGenModal: false,
       isTemplatesFetching: false
     }
   },
@@ -62,13 +64,9 @@ export default {
   methods: {
     proceedToGenerate(hash, openGenModal) {
       if (hash) {
-        this.hideGenModal = false;
         this.selectedHash = hash;
         openGenModal();
       }
-    },
-    handleModalClose() {
-      this.hideGenModal = true;
     }
   }
 }
